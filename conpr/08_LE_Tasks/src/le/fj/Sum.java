@@ -1,7 +1,9 @@
 package le.fj;
 
 import java.util.Random;
-import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Callable;
 import java.util.concurrent.RecursiveTask;
 
 @SuppressWarnings("serial")
@@ -36,7 +38,7 @@ public class Sum extends RecursiveTask<Integer> {
     public static void main(String[] args) {
         Random rnd = new Random();
         int SIZE = 500000000;
-        ForkJoinPool fj = new ForkJoinPool();
+        ExecutorService fj = Executors.newVirtualThreadPerTaskExecutor();
       
         
         int[] l = new int[SIZE];
@@ -45,8 +47,17 @@ public class Sum extends RecursiveTask<Integer> {
         }
         
         long start = System.currentTimeMillis();
-        int sum = fj.invoke(new Sum(l, 0, l.length));
-        long duration = System.currentTimeMillis() - start;
-        System.out.println("Sum: " + sum + " duration: " + duration + " ms");
+        try {
+	    int sum = fj.submit(new Callable<Integer>() {
+		@Override
+		public Integer call(){
+		    return new Sum(l, 0, l.length).compute();
+		}	
+	    }).get();
+	    long duration = System.currentTimeMillis() - start;
+            System.out.println("Sum: " + sum + " duration: " + duration + " ms");
+	} catch (Exception e) {
+	    e.printStackTrace();
+	}
     }
 }
