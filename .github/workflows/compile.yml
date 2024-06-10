@@ -1,0 +1,27 @@
+on:
+  push:
+    branches:
+      - master
+      - fibers
+  pull_request:
+    branches:
+      - master
+      - fibers
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v2
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v2
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+          cache: 'maven'
+        
+      - name: Compile Sum.java
+        run: javac conpr/08_LE_Tasks/src/le/fj/Sum.java
