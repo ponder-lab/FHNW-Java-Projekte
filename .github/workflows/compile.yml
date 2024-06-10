@@ -9,7 +9,7 @@ on:
       - fibers
 
 jobs:
-  build:
+  compile:
     runs-on: ubuntu-latest
 
     steps:
