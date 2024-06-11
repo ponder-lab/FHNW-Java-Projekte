@@ -2,10 +2,12 @@ on:
   push:
     branches:
       - master
+      - correction
       - fibers
   pull_request:
     branches:
       - master
+      - correction
       - fibers
 
 jobs:
