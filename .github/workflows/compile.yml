@@ -27,3 +27,6 @@ jobs:
         
       - name: Compile Sum.java
         run: javac conpr/08_LE_Tasks/src/le/fj/Sum.java
+
+      - name: Run Sum.java
+        run: java conpr/08_LE_Tasks/src/le/fj/Sum.java
