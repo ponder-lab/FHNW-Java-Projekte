@@ -37,8 +37,7 @@ public class Sum implements Callable<Integer> {
     public static void main(String[] args) {
         Random rnd = new Random();
         int SIZE = 40000000;
-        ExecutorService fj = Executors.newVirtualThreadPerTaskExecutor();
-      
+        ExecutorService fj = Executors.newVirtualThreadPerTaskExecutor(); 
         
         int[] l = new int[SIZE];
         for (int i = 0; i < l.length; i++) {
