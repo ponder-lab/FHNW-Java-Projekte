@@ -1,13 +1,13 @@
 package le.fj;
 
 import java.util.Random;
+import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Callable;
-import java.util.concurrent.RecursiveTask;
 
 @SuppressWarnings("serial")
-public class Sum extends RecursiveTask<Integer> {
+public class Sum implements Callable<Integer> {
     final int THRESHOLD = 1000000;
     final int[] array;
     final int lo;
@@ -19,25 +19,24 @@ public class Sum extends RecursiveTask<Integer> {
         this.hi = hi;
     }
 
-    protected Integer compute() {
+    public Integer call() {
         if (hi - lo < THRESHOLD) {
             int sum = array[lo];
-            for(int i = lo + 1; i <= lo; i++) {
+            for(int i = lo + 1; i < hi; i++) {
                 sum += array[i];
             }
             return sum; 
         } else {
             int mid = (hi + lo) / 2;
             Sum firstHalf = new Sum(array, lo, mid);
-            firstHalf.fork();
             Sum secondHalf = new Sum(array, mid, hi);
-            return secondHalf.compute() + firstHalf.join();
+            return secondHalf.call() + firstHalf.call();
         }
     }
     
     public static void main(String[] args) {
         Random rnd = new Random();
-        int SIZE = 500000000;
+        int SIZE = 40000000;
         ExecutorService fj = Executors.newVirtualThreadPerTaskExecutor();
       
         
@@ -48,16 +47,11 @@ public class Sum extends RecursiveTask<Integer> {
         
         long start = System.currentTimeMillis();
         try {
-	    int sum = fj.submit(new Callable<Integer>() {
-		@Override
-		public Integer call(){
-		    return new Sum(l, 0, l.length).compute();
-		}	
-	    }).get();
-	    long duration = System.currentTimeMillis() - start;
+            int sum = fj.submit(new Sum(l, 0, l.length)).get();
+            long duration = System.currentTimeMillis() - start;
             System.out.println("Sum: " + sum + " duration: " + duration + " ms");
-	} catch (Exception e) {
-	    e.printStackTrace();
-	}
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
