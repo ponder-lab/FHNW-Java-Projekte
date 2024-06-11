@@ -12,11 +12,13 @@ public class Sum implements Callable<Integer> {
     final int[] array;
     final int lo;
     final int hi;
+    final ExecutorService exec;
 
-    Sum(int[] array, int lo, int hi) {
+    Sum(int[] array, int lo, int hi, ExecutorService exec) {
         this.array = array;
         this.lo = lo;
         this.hi = hi;
+        this.exec = exec;
     }
 
     public Integer call() {
@@ -28,9 +30,14 @@ public class Sum implements Callable<Integer> {
             return sum; 
         } else {
             int mid = (hi + lo) / 2;
-            Sum firstHalf = new Sum(array, lo, mid);
-            Sum secondHalf = new Sum(array, mid, hi);
-            return secondHalf.call() + firstHalf.call();
+            Sum firstHalf = new Sum(array, lo, mid, exec);
+            Sum secondHalf = new Sum(array, mid, hi, exec);
+            try {
+                return exec.submit(secondHalf).get() + exec.submit(firstHalf).get();
+            } catch (Exception e) {
+                e.printStackTrace();
+                return 0;
+            }
         }
     }
     
@@ -46,7 +53,7 @@ public class Sum implements Callable<Integer> {
         
         long start = System.currentTimeMillis();
         try {
-            int sum = fj.submit(new Sum(l, 0, l.length)).get();
+            int sum = fj.submit(new Sum(l, 0, l.length, fj)).get();
             long duration = System.currentTimeMillis() - start;
             System.out.println("Sum: " + sum + " duration: " + duration + " ms");
         } catch (Exception e) {
