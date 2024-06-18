@@ -6,7 +6,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Callable;
 
 @SuppressWarnings("serial")
-public class Sum extends RecursiveTask<Integer> {
+public class Sum implements Callable<Integer> {
     final int THRESHOLD = 100000;
     final int[] array;
     final int lo;
